@@ -43,11 +43,31 @@ int main(int argc, char const *argv[])
 	hints.ai_socktype = SOCK_STREAM;
 	getaddrinfo(server_ip.c_str(), server_port.c_str(), &hints, &server_addr);
 
-	// TODO: Connect() to the server (hint: you'll need to use server_addr)
+	// TODO: Connect() to the server
+	if (connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
+		std::cout << "No connection.\n";
+		close(client_fd);
+		return -1;
+	}
 	// TODO: Retreive user input
+	std::string user_input;
+	std:: cout << "Enter input: ";
+	std::getline(std::cin, user_input); 
 	// TODO: Send() the user input to the server
+	 // 5️⃣ Send user input to the server
+    	send(client_fd, user_input.c_str(), user_input.length(), 0);
 	// TODO: Recieve any messages from the server and print it here. Don't forget to make sure the string is null terminated!
+	char buff[1024]; 
+	int messageRecieved = recv(client_fd, buff, 1023, 0);
+	
+	if (messageRecieved > 0) {
+		buff[messageRecieved] = '\0'; 
+		std::cout << "Message: " << buff << std::endl;
+	} else {
+		std::cout << "No connection. Failed.\n";
+	}	
 	// TODO: Close() the socket
+	close(client_fd); 
 
 	return 0; 
 } 
